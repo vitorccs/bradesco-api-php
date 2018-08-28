@@ -1,0 +1,36 @@
+{
+    "name": "vitorccs/bradesco-api-php",
+    "description": "SDK PHP para a API de Registro de Boletos do Bradesco",
+    "keywords": [
+        "bradesco",
+        "cobranca",
+        "cobrança",
+        "registro",
+        "boleto",
+        "titulo"
+    ],
+    "homepage": "https://github.com/vitorccs/bradesco-api-php",
+    "license": "GPL-3.0",
+    "require": {
+        "php": ">=7.0.0",
+        "guzzlehttp/guzzle": "^6.3"
+    },
+    "require-dev": {
+        "php": ">=7.0",
+        "phpunit/phpunit": "^6"
+    },
+    "authors": [
+        {
+            "name": "Vitor Siqueira",
+            "email": "vitorccsiqueira@gmail.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "BradescoApi\\": "src"
+        }
+    },
+    "scripts": {
+        "test": "phpunit"
+    }
+}
