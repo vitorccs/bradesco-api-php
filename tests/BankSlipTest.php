@@ -6,18 +6,48 @@ namespace ApiBradesco\Test;
 use PHPUnit\Framework\TestCase;
 use BradescoApi\BankSlip;
 use BradescoApi\Exceptions\BradescoClientException;
+use BradescoApi\Exceptions\BradescoRequestException;
 
 class BankSlipTest extends TestCase
 {
-    /** @test */
+    /**
+     * @test
+     * @expectedException        BradescoApi\Exceptions\BradescoRequestException
+     * @expectedExceptionMessage Contrato n&atilde;o encontrado (-2)
+     */
     public function it_should_get_contract_not_found()
     {
-        $data               = [];
+        $data = [];
+        $bankSlip = BankSlip::create($data);
+    }
+
+    /**
+     * @test
+     */
+    public function it_should_register_bank_slip()
+    {
+        $data               = (array) json_decode(getenv('DATA'));
+
+        $defaultData        = [
+            "nomePagador"           => "Cliente Teste",
+            "logradouroPagador"     => "Rua Teste",
+            "nuLogradouroPagador"   => "90",
+            "cepPagador"            => "12345",
+            "complementoCepPagador" => "500",
+            "bairroPagador"         => "Bairro Teste",
+            "municipioPagador"      => "Teste",
+            "ufPagador"             => "SP",
+            "cdIndCpfcnpjPagador"   => "1",
+            "nuCpfcnpjPagador"      => "00087912543023"
+        ];
+
+        $data               = array_merge($defaultData, $data);
+
         $bankSlip           = BankSlip::create($data);
 
-        $errorCode          = $bankSlip->cdErro ?? null;
-        $isContractNotFound = ($errorCode == -2);
+        $errorCode          = $bankSlip->cdErro ?? 0;
+        $success            = ($errorCode == 0);
 
-        $this->assertTrue($isContractNotFound);
+        $this->assertTrue($success);
     }
 }

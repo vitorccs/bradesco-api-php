@@ -55,14 +55,13 @@ class Api
 
     private function soapToJson(string $content)
     {
-        $doc = new \DOMDocument();
-        $doc->loadXML($content);
+        $data = "{}";
 
-        $data = $doc->getElementsByTagName('return')->item(0)->nodeValue;
-        $data = preg_replace('/, }/i', '}', $data);
-        $data = json_decode($data);
+        if (preg_match('/<return>(\{[^}]+\})<\/return>/smi', $content, $matches)) {
+            $data = $matches[1];
+        }
 
-        return $data;
+        return json_decode($data);
     }
 
     private function checkForErrors(ResponseInterface $response, \stdClass $data)
@@ -70,20 +69,24 @@ class Api
         $code           = $response->getStatusCode();
         $statusClass    = (int) ($code / 100);
 
+        // Not in accordante to REST API specification:
+        // Request errors are received as "200 OK" rather than
+        // "400 Bad Request" or "422 Unprocessable Entity"
+        $this->checkForRequestException($data);
+
         if ($statusClass === 4 || $statusClass === 5) {
-            $this->checkForRequestException($data);
             $this->checkForClientException($response);
         }
     }
 
     private function checkForRequestException(\stdClass $data)
     {
-        $code    = $data->cdErro ?? null;
-        $reason  = $data->msgErro ?? null;
+        $code    = $data->cdErro ?? 0;
+        $reason  = $data->msgErro ?? 'Unknown error';
 
-        if (!$code && !$reason) return;
+        if (!$code) return;
 
-        $message = "{$code} ($reason)";
+        $message = "{$reason} ($code)";
 
         throw new BradescoRequestException($message);
     }
@@ -93,7 +96,7 @@ class Api
         $code    = $response->getStatusCode();
         $reason  = $response->getReasonPhrase();
 
-        $message = "{$code} ($reason)";
+        $message = "{$reason} ($code)";
 
         throw new BradescoClientException($message);
     }

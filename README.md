@@ -29,10 +29,15 @@ BRADESCO_FOLDER_PATH | Não | "" | Caminho para esta biblioteca gerar arquivos t
 
 ## Como usar
 Após definir as variáveis de ambiente acima, basta utilizar o comando abaixo passando os dados do boleo a registrar em formato `array`.
-Obs: Não é necessário se preocupar em informar valores padrão para os campos não utilizados (página 19 do manual), a biblioteca já os insere automaticamente quando detecta que não consta em seu `array`.
 ```php
 $person = \BradescoApi\BankSlip::create($data);
 ```
+
+## Normalização de dados
+* Campos ausentes de seu `array` de dados são automaticamente inseridos com seus respectivos valores padrão (confirme orientando na página 19 do manual da API do Bradesco).
+* Datas no formato "dd-mm-yyyy" ou "dd/mm/yyy" são normalizadas para o formato exigido pela API ("dd.mm.yyyy").
+* Moedas no formato 14.90 ou "14,90" são normalizadas para o formato exigido pela API ("1490").
+* Números de CPF e CNPJ "123.456.789-01" são normalizadas para o formato exigido pela API ("00012345678901").
 
 ## Exemplo de implementação
 
@@ -43,9 +48,9 @@ ini_set('display_errors', 1);
 require __DIR__.'/vendor/autoload.php';
 
 putenv('BRADESCO_SANDBOX=true');
-putenv('BRADESCO_TIMEOUT=30');
-putenv('BRADESCO_CERT_PATH=mycertificate.pfx');
-putenv('BRADESCO_CERT_PASSWORD=mypassword');
+putenv('BRADESCO_TIMEOUT=20');
+putenv('BRADESCO_CERT_PATH=myCertificate.pfx');
+putenv('BRADESCO_CERT_PASSWORD=myPassword');
 
 $data = [
   "nuCPFCNPJ" => "123456789",
@@ -56,21 +61,21 @@ $data = [
   "nuNegociacao" => "123400000001234567",
   "cdBanco" => "237",
   "nuCliente" => "123456",
-  "dtEmissaoTitulo" => "25.05.2017",
-  "dtVencimentoTitulo" => "20.06.2017",
-  "vlNominalTitulo" => "100",
+  "dtEmissaoTitulo" => "25/05/2017",
+  "dtVencimentoTitulo" => "2017-06-20",
+  "vlNominalTitulo" => 100.00,
   "cdEspecieTitulo" => "04",
   "nomePagador" => "Cliente Teste",
-  "logradouroPagador" => "rua Teste",
+  "logradouroPagador" => "Rua Teste",
   "nuLogradouroPagador" => "90",
   "complementoLogradouroPagador" => "",
   "cepPagador" => "12345",
   "complementoCepPagador" => "500",
-  "bairroPagador" => "bairro Teste",
-  "municipioPagador" => "Teste",
+  "bairroPagador" => "Bairro Teste",
+  "municipioPagador" => "Cidade Teste",
   "ufPagador" => "SP",
   "cdIndCpfcnpjPagador" => "1",
-  "nuCpfcnpjPagador" => "12345648901234",
+  "nuCpfcnpjPagador" => "549.435.260-98",
 ];
 
 try {
