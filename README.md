@@ -28,7 +28,7 @@ BRADESCO_TIMEOUT | Não | 30 | Timeout em segundos para estabelecer conexão com
 BRADESCO_FOLDER_PATH | Não | "" | Caminho para esta biblioteca gerar arquivos temporários, necessários parar realizar a criptografia. Os arquivos são criados com hash randômica e excluídos automaticamente, sem a necessidade de se preocupar em limpá-los periodicamente.
 
 ## Como usar
-Após definir as variáveis de ambiente acima, basta utilizar o comando abaixo passando os dados do boleo a registrar em formato `array`. 
+Após definir as variáveis de ambiente acima, basta utilizar o comando abaixo passando os dados do boleo a registrar em formato `array`.
 Obs: Não é necessário se preocupar em informar valores padrão para os campos não utilizados (página 19 do manual), a biblioteca já os insere automaticamente quando detecta que não consta em seu `array`.
 ```php
 $person = \BradescoApi\BankSlip::create($data);
@@ -79,4 +79,16 @@ try {
 } catch (\Exception $e) {
     echo $e->getMessage();
 }
+```
+
+## Testes
+Caso queira contribuir, por favor, implementar testes de unidade em PHPUnit.
+
+Para executar:
+1) Faça uma cópia de phpunit.xml.dist em phpunit.xml na raíz do projeto
+2) Altere os parâmtros ENV com os dados de seu acesso
+3) Execute o comando abaixo no terminal dentro da pasta deste projeto:
+
+```bash
+composer test
 ```

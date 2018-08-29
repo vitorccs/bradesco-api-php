@@ -32,8 +32,12 @@ class Bradesco
             static::$sandbox = getenv(static::SANDBOX);
         }
 
-        if (static::$sandbox === null) {
+        if (static::$sandbox === false) {
             static::$sandbox = static::$defIsSandbox;
+        }
+
+        if (strtolower(static::$sandbox) === "false") {
+            static::$sandbox = false;
         }
     }
 
@@ -72,7 +76,7 @@ class Bradesco
             static::$timeout = getenv(static::TIMEOUT);
         }
 
-        if (static::$timeout === null) {
+        if (static::$timeout === false) {
             static::$timeout = static::$defTimeout;
         }
     }
@@ -85,7 +89,7 @@ class Bradesco
             static::$certPath = getenv(static::CERT_PATH);
         }
 
-        if (static::$certPath === null) {
+        if (static::$certPath === false) {
             throw new BradescoClientException("Missing required parameter 'CERT_PATH'");
         }
     }
@@ -98,7 +102,7 @@ class Bradesco
             static::$folderPath = getenv(static::FOLDER_PATH);
         }
 
-        if (static::$folderPath === null) {
+        if (static::$folderPath === false) {
             static::$folderPath = '';
         }
     }
@@ -111,7 +115,7 @@ class Bradesco
             static::$certPassword = getenv(static::CERT_PASSWORD);
         }
 
-        if (static::$certPassword === null) {
+        if (static::$certPassword === false) {
             throw new BradescoClientException("Missing required parameter 'CERT_PASSWORD'");
         }
     }

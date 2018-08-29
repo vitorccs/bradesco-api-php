@@ -30,7 +30,12 @@
             "BradescoApi\\": "src"
         }
     },
+    "autoload-dev": {
+        "psr-4": {
+            "BradescoApi\\Test\\": "tests"
+        }
+    },
     "scripts": {
-        "test": "phpunit"
+        "test": "phpunit --testdox"
     }
 }
