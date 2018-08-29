@@ -54,7 +54,7 @@ class Client extends Guzzle
         $certFile = file_get_contents($certPath);
 
         if (!openssl_pkcs12_read($certFile, $result, $certPassword)) {
-            throw new BradescoClientException('Unable to read certificate file .pfx');
+            throw new BradescoClientException('Unable to read certificate file .pfx. Please check the certificate password.');
         }
 
         $this->certKey    = openssl_x509_read($result['cert']);

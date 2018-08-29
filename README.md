@@ -27,8 +27,8 @@ BRADESCO_SANDBOX | Não | true | Utilizar ambiente de Homologação (true) ou Pr
 BRADESCO_TIMEOUT | Não | 30 | Timeout em segundos para estabelecer conexão com a API
 BRADESCO_FOLDER_PATH | Não | "" | Caminho para esta biblioteca gerar arquivos temporários, necessários parar realizar a criptografia. Os arquivos são criados com hash randômica e excluídos automaticamente, sem a necessidade de se preocupar em limpá-los periodicamente.
 
-## Comom usar
-Basta passar os dados em formato `array`. 
+## Como usar
+Após definir as variáveis de ambiente acima, basta utilizar o comando abaixo passando os dados do boleo a registrar em formato `array`. 
 Obs: Não é necessário se preocupar em informar valores padrão para os campos não utilizados (página 19 do manual), a biblioteca já os insere automaticamente quando detecta que não consta em seu `array`.
 ```php
 $person = \BradescoApi\BankSlip::create($data);
