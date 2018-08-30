@@ -28,14 +28,14 @@ BRADESCO_TIMEOUT | Não | 30 | Timeout em segundos para estabelecer conexão com
 BRADESCO_FOLDER_PATH | Não | "" | Caminho para esta biblioteca gerar arquivos temporários, necessários parar realizar a criptografia. Os arquivos são criados com hash randômica e excluídos automaticamente, sem a necessidade de se preocupar em limpá-los periodicamente.
 
 ## Como usar
-Após definir as variáveis de ambiente acima, basta utilizar o comando abaixo passando os dados do boleo a registrar em formato `array`.
+Após definir as variáveis de ambiente acima, basta utilizar o comando abaixo passando os dados do boleto a registrar em formato `array`.
 ```php
-$person = \BradescoApi\BankSlip::create($data);
+$boleto = \BradescoApi\BankSlip::create($data);
 ```
 
 ## Normalização de dados
 * Campos ausentes de seu `array` de dados são automaticamente inseridos com seus respectivos valores padrão (confirme orientando na página 19 do manual da API do Bradesco).
-* Datas no formato "dd-mm-yyyy" ou "dd/mm/yyy" são normalizadas para o formato exigido pela API ("dd.mm.yyyy").
+* Datas no formato "yyyy-mm-dd" ou "dd/mm/yyy" são normalizadas para o formato exigido pela API ("dd.mm.yyyy").
 * Moedas no formato 14.90 ou "14,90" são normalizadas para o formato exigido pela API ("1490").
 * Números de CPF e CNPJ "123.456.789-01" são normalizadas para o formato exigido pela API ("00012345678901").
 
