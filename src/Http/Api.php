@@ -86,6 +86,11 @@ class Api
 
         if (!$code) return;
 
+        // Fixes text of 'CdErro' field, which contains double enconded
+        // HTML entities ("&amp;atilde;" rather than "&atilde;")
+        $reason = html_entity_decode($reason);
+        $reason = html_entity_decode($reason);
+
         $message = "{$reason} ($code)";
 
         throw new BradescoRequestException($message);
