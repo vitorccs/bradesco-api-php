@@ -4,15 +4,19 @@ namespace BradescoApi\Helpers;
 class Fixer
 {
     protected static $defaultBankSlip = [
-        "clubBanco" => "0",
-        "cdTipoContrato" => "0",
-        "nuSequenciaContrato" => "0",
+        // const values
         "cdBanco" => "237",
-        "eNuSequenciaContrato" => "0",
+        "cdTipoAcesso" => "2",
         "tpRegistro" => "1",
+        "cdTipoContrato" => "48",
+        "clubBanco" => "2269651",
+        "tpVencimento" => "0",
+
+        // empty values
+        "nuSequenciaContrato" => "0",
+        "eNuSequenciaContrato" => "0",
         "cdProduto" => "0",
         "nuTitulo" => "0",
-        "tpVencimento" => "0",
         "tpProtestoAutomaticoNegativacao" => "0",
         "prazoProtestoAutomaticoNegativacao" => "0",
         "controleParticipante" => "",
@@ -70,12 +74,12 @@ class Fixer
         'vlNominalTitulo'
     ];
 
-    public static function mergeWithDefaultData(array $data)
+    public static function mergeWithDefaultData(array &$data)
     {
-        return array_merge(static::$defaultBankSlip, $data);
+        $data = array_merge(static::$defaultBankSlip, $data);
     }
 
-    public static function formatData(array $data)
+    public static function formatData(array &$data)
     {
         foreach(static::$dateFields as $field) {
             if (!isset($data[$field])) continue;
@@ -91,8 +95,40 @@ class Fixer
             if (!isset($data[$field])) continue;
             $data[$field] = Formatter::formatCurrency($data[$field]);
         }
+    }
 
-        return $data;
+    public static function changeNullToEmpty(array &$data)
+    {
+        array_walk($data, function(&$item, $key) {
+            if ($item === null) $item = "";
+        });
+    }
+
+    public static function setCustomerType(array &$data)
+    {
+        if ($data['cdIndCpfcnpjPagador'] ?? null) return;
+
+        if (!isset($data['nuCpfcnpjPagador'])) return;
+
+        $isPerson = preg_match('/^000/', $data['nuCpfcnpjPagador']);
+
+        $data['cdIndCpfcnpjPagador'] = $isPerson ? "1" : "2";
+    }
+
+    public static function fixAll(array &$data)
+    {
+        // Per Bradesco API specs, all non-used fields must be
+        // sent anyways but with their default values (0 or "")
+        static::mergeWithDefaultData($data);
+
+        // Format currency, date  and "CPF/CNPJ" values per Bradeso API specs
+        static::formatData($data);
+
+        // Bradesco API does not accept null, only empty
+        static::changeNullToEmpty($data);
+
+        // Automatically fill "cdIndCpfcnpjPagador" field
+        static::setCustomerType($data);
     }
 }
 

@@ -8,8 +8,7 @@ class BankSlip extends Resource
 {
     public static function create(array $data)
     {
-        $data = Fixer::mergeWithDefaultData($data);
-        $data = Fixer::formatData($data);
+        Fixer::fixAll($data);
 
         $response = parent::create($data);
 
