@@ -24,13 +24,16 @@ class Formatter
     // expected format: ddmmyyyy
     public static function formatDate($value)
     {
-        if (is_string($value) && preg_match('/\d{1,2}\/\d{1,2}\/\d{4}/', $value))
-        {
+        // remove the time part
+        if (is_string($value)) {
+            $value = substr($value, 0, 10);
+        }
+
+        if (is_string($value) && preg_match('/\d{2}\/\d{2}\/\d{4}/', $value)) {
             $value = \DateTime::createFromFormat('d/m/Y', $value);
         }
 
-        if (is_string($value) && preg_match('/\d{4}\-\d{1,2}\-\d{1,2}/', $value))
-        {
+        if (is_string($value) && preg_match('/\d{4}\-\d{2}\-\d{2}/', $value)) {
             $value = \DateTime::createFromFormat('Y-m-d', $value);
         }
 

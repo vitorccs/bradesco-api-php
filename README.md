@@ -34,12 +34,13 @@ $boleto = \BradescoApi\BankSlip::create($data);
 ```
 
 ## Normalização de dados
-* Campos ausentes são automaticamente inseridos com seus respectivos valores padrão (confirme orientando na página 19 do manual da API do Bradesco).
-* Não é necessário informar campos cujos valores o manual determina como fixos.
-* Valores em `null` são automaticamente trocados para vazio "".
-* Datas no formato "yyyy-mm-dd" ou "dd/mm/yyy" são normalizadas para o formato exigido pela API ("dd.mm.yyyy").
-* Moedas no formato 14.90 ou "14,90" são normalizadas para o formato exigido pela API ("1490").
-* Números de CPF e CNPJ "123.456.789-01" são normalizadas para o formato exigido pela API ("00012345678901").
+Foram adicionadas diversas funções para normalizar os dados conforme exigido pela API do Bradesco:
+* Campos ausentes são inseridos com seus respectivos valores padrão (página 19 do manual).
+* Valores em `null` são trocados para vazio "".
+* Valores em `integer` ou `float` são convertidos para string.
+* Datas no formato "yyyy-mm-dd" ou "dd/mm/yyy" são normalizadas para "dd.mm.yyyy".
+* Moedas no formato 14.90 ou "14,90" são normalizadas para "1490".
+* Números de CPF e CNPJ "123.456.789-01" são normalizadas para "00012345678901".
 
 ## Exemplo de implementação
 

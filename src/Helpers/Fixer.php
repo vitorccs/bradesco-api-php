@@ -100,7 +100,18 @@ class Fixer
     public static function changeNullToEmpty(array &$data)
     {
         array_walk($data, function(&$item, $key) {
-            if ($item === null) $item = "";
+            if ($item === null) {
+                $item = "";
+            }
+        });
+    }
+
+    public static function changeNumericToString(array &$data)
+    {
+        array_walk($data, function(&$item, $key) {
+            if (is_float($item) || is_int($item)) {
+                $item = (string) $item;
+            }
         });
     }
 
@@ -126,6 +137,9 @@ class Fixer
 
         // Bradesco API does not accept null, only empty
         static::changeNullToEmpty($data);
+
+        // Bradesco API does not accept integer or float, only string
+        static::changeNumericToString($data);
 
         // Automatically fill "cdIndCpfcnpjPagador" field
         static::setCustomerType($data);
