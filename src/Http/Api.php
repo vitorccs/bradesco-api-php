@@ -32,11 +32,11 @@ class Api
         } catch (ClientException $e) {
             $response = $e->getResponse();
         } catch (RequestException $e) {
-            $response = $e->getResponse();
-        }
+            if (!$e->hasResponse()) {
+                throw new BradescoRequestException($e->getMessage());
+            }
 
-        if (!$response) {
-            throw new BradescoClientException('Unable to connect to the host');
+            $response = $e->getResponse();
         }
 
         return $this->response($response);
@@ -44,7 +44,7 @@ class Api
 
     private function response(ResponseInterface $response)
     {
-        $content = $response->getBody();
+        $content = $response->getBody()->getContents();
 
         $data = $this->soapToJson($content);
 
@@ -72,14 +72,14 @@ class Api
         // Not in accordante to REST API specification:
         // Request errors are received as "200 OK" rather than
         // "400 Bad Request" or "422 Unprocessable Entity"
-        $this->checkForRequestException($data);
+        $this->checkForClientException($data);
 
         if ($statusClass === 4 || $statusClass === 5) {
-            $this->checkForClientException($response);
+            $this->checkForRequestException($response);
         }
     }
 
-    private function checkForRequestException(\stdClass $data)
+    private function checkForClientException(\stdClass $data)
     {
         $code    = $data->cdErro ?? 0;
         $reason  = $data->msgErro ?? 'Unknown error';
@@ -94,17 +94,17 @@ class Api
 
         $message = "{$reason} ($code)";
 
-        throw new BradescoRequestException($message);
+        throw new BradescoClientException($message);
     }
 
-    private function checkForClientException(ResponseInterface $response)
+    private function checkForRequestException(ResponseInterface $response)
     {
         $code    = $response->getStatusCode();
         $reason  = $response->getReasonPhrase();
 
         $message = "{$reason} ($code)";
 
-        throw new BradescoClientException($message);
+        throw new BradescoRequestException($message);
     }
 
     public function encryptBodyData($params)
