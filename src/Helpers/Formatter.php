@@ -53,6 +53,31 @@ class Formatter
 
         return $value;
     }
+
+    // expected format: no special chars, API has trouble processing them
+    public static function formatText($value)
+    {
+        $rules = [
+            ['[ãáàâ]', 'a'],
+            ['[ÃÁÀÂ]', 'A'],
+            ['[ẽéèê]', 'e'],
+            ['[ẼÉÈÊ]', 'E'],
+            ['[ĩíìî]', 'i'],
+            ['[ĨÍÌÎ]', 'I'],
+            ['[õóòô]', 'o'],
+            ['[ÕÓÒÔ]', 'O'],
+            ['[ũúùû]', 'u'],
+            ['[ŨÚÙÛ]', 'U'],
+            ['[ç]', 'c'],
+            ['[Ç]', 'C']
+        ];
+
+        foreach ($rules as $rule) {
+            $value = preg_replace('/'. $rule[0] . '/u', $rule[1], $value);
+        }
+
+        return $value;
+    }
 }
 
 ?>

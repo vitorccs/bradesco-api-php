@@ -86,6 +86,7 @@ class Api
 
         if (!$code) return;
 
+        // Bradesco API issue
         // Fixes text of 'CdErro' field, which contains double enconded
         // HTML entities ("&amp;atilde;" rather than "&atilde;")
         $reason = html_entity_decode($reason);
@@ -108,7 +109,12 @@ class Api
 
     public function encryptBodyData($params)
     {
-        $message      = json_encode($params);
+        // Bradesco API issue
+        // Do not escape special chars to Unicode since Bradesco API
+        // does not decode them and Bank Slips are issued with
+        // strange chars like "Jo\u00e3o"
+        $message      = json_encode($params, JSON_UNESCAPED_UNICODE);
+
         $certKey      = $this->client->getCertKey();
         $privateKey   = $this->client->getPrivateKey();
         $folderPath   = $this->client->getFolderPath();

@@ -74,6 +74,14 @@ class Fixer
         'vlNominalTitulo'
     ];
 
+    protected static $textFields = [
+        'nomePagador',
+        'logradouroPagador',
+        'complementoLogradouroPagador',
+        'bairroPagador',
+        'municipioPagador'
+    ];
+
     public static function mergeWithDefaultData(array &$data)
     {
         $data = array_merge(static::$defaultBankSlip, $data);
@@ -94,6 +102,11 @@ class Fixer
         foreach(static::$currencyFields as $field) {
             if (!isset($data[$field])) continue;
             $data[$field] = Formatter::formatCurrency($data[$field]);
+        }
+
+        foreach(static::$textFields as $field) {
+            if (!isset($data[$field])) continue;
+            $data[$field] = Formatter::formatText($data[$field]);
         }
     }
 
@@ -132,7 +145,7 @@ class Fixer
         // sent anyways but with their default values (0 or "")
         static::mergeWithDefaultData($data);
 
-        // Format currency, date  and "CPF/CNPJ" values per Bradeso API specs
+        // Format currency, date, text  and "CPF/CNPJ" fields to API specs
         static::formatData($data);
 
         // Bradesco API does not accept null, only empty
