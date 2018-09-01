@@ -12,7 +12,7 @@ class BankSlipTest extends TestCase
 {
     /**
      * @test
-     * @expectedException        BradescoApi\Exceptions\BradescoRequestException
+     * @expectedException        BradescoApi\Exceptions\BradescoClientException
      * @expectedExceptionMessage Contrato não encontrado (-2)
      */
     public function it_should_get_contract_not_found()
