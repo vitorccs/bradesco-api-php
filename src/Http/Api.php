@@ -4,7 +4,7 @@ namespace BradescoApi\Http;
 use Psr\Http\Message\ResponseInterface;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\RequestException;
-use BradescoApi\Exceptions\BradescoClientException;
+use BradescoApi\Exceptions\BradescoValidationException;
 use BradescoApi\Exceptions\BradescoRequestException;
 
 class Api
@@ -29,8 +29,6 @@ class Api
     {
         try {
             $response = $this->client->request($method, $endpoint, $options);
-        } catch (ClientException $e) {
-            $response = $e->getResponse();
         } catch (RequestException $e) {
             if (!$e->hasResponse()) {
                 throw new BradescoRequestException($e->getMessage());
@@ -72,14 +70,14 @@ class Api
         // Not in accordante to REST API specification:
         // Request errors are received as "200 OK" rather than
         // "400 Bad Request" or "422 Unprocessable Entity"
-        $this->checkForClientException($data);
+        $this->BradescoValidationException($data);
 
         if ($statusClass === 4 || $statusClass === 5) {
             $this->checkForRequestException($response);
         }
     }
 
-    private function checkForClientException(\stdClass $data)
+    private function BradescoValidationException(\stdClass $data)
     {
         $code    = $data->cdErro ?? 0;
         $reason  = $data->msgErro ?? 'Unknown error';
@@ -94,7 +92,7 @@ class Api
 
         $message = "{$reason} ($code)";
 
-        throw new BradescoClientException($message);
+        throw new BradescoValidationException($message);
     }
 
     private function checkForRequestException(ResponseInterface $response)

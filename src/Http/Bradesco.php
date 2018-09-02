@@ -1,7 +1,7 @@
 <?php
 namespace BradescoApi\Http;
 
-use BradescoApi\Exceptions\BradescoClientException;
+use BradescoApi\Exceptions\BradescoParameterException;
 
 class Bradesco
 {
@@ -22,7 +22,7 @@ class Bradesco
     private static $folderPath    = null;
     private static $sandboxUrl    = 'https://cobranca.bradesconetempresa.b.br/ibpjregistrotitulows/registrotitulohomologacao';
     private static $productionUrl = 'https://cobranca.bradesconetempresa.b.br/ibpjregistrotitulows/registrotitulo';
-    private static $sdkVersion    = 1.0;
+    private static $sdkVersion    = "1.3.1";
 
     public static function setIsSandbox(bool $enable = null)
     {
@@ -90,7 +90,7 @@ class Bradesco
         }
 
         if (static::$certPath === false) {
-            throw new BradescoClientException("Missing required parameter 'CERT_PATH'");
+            throw new BradescoParameterException("Missing required parameter 'CERT_PATH'");
         }
     }
 
@@ -116,7 +116,7 @@ class Bradesco
         }
 
         if (static::$certPassword === false) {
-            throw new BradescoClientException("Missing required parameter 'CERT_PASSWORD'");
+            throw new BradescoParameterException("Missing required parameter 'CERT_PASSWORD'");
         }
     }
 

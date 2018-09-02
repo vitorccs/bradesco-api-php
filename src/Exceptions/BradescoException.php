@@ -3,6 +3,6 @@ namespace BradescoApi\Exceptions;
 
 use Exception;
 
-class BradescoClientException extends Exception
+class BradescoException extends Exception
 {
 }

@@ -3,7 +3,7 @@ namespace BradescoApi\Http;
 
 use GuzzleHttp\Client as Guzzle;
 use GuzzleHttp\TransferStats;
-use BradescoApi\Exceptions\BradescoClientException;
+use BradescoApi\Exceptions\BradescoParameterException;
 
 class Client extends Guzzle
 {
@@ -48,13 +48,13 @@ class Client extends Guzzle
         $certPath     = Bradesco::getCertPath();
 
         if (!file_exists($certPath)) {
-            throw new BradescoClientException('Certificate file .pfx not found');
+            throw new BradescoParameterException('Certificate file .pfx not found');
         }
 
         $certFile = file_get_contents($certPath);
 
         if (!openssl_pkcs12_read($certFile, $result, $certPassword)) {
-            throw new BradescoClientException('Unable to read certificate file .pfx. Please check the certificate password.');
+            throw new BradescoParameterException('Unable to read certificate file .pfx. Please check the certificate password.');
         }
 
         $this->certKey    = openssl_x509_read($result['cert']);

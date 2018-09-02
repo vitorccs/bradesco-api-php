@@ -5,14 +5,13 @@ namespace ApiBradesco\Test;
 
 use PHPUnit\Framework\TestCase;
 use BradescoApi\BankSlip;
-use BradescoApi\Exceptions\BradescoClientException;
-use BradescoApi\Exceptions\BradescoRequestException;
+use BradescoApi\Exceptions\BradescoValidationException;
 
 class BankSlipTest extends TestCase
 {
     /**
      * @test
-     * @expectedException        BradescoApi\Exceptions\BradescoClientException
+     * @expectedException        BradescoApi\Exceptions\BradescoValidationException
      * @expectedExceptionMessage Contrato não encontrado (-2)
      */
     public function it_should_get_contract_not_found()

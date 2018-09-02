@@ -6,9 +6,11 @@ use BradescoApi\Helpers\Fixer;
 
 class BankSlip extends Resource
 {
-    public static function create(array $data)
+    public static function create(array $data, bool $fix = true)
     {
-        Fixer::fixAll($data);
+        if ($fix) {
+            Fixer::fixAll($data);
+        }
 
         $response = parent::create($data);
 

@@ -5,7 +5,6 @@ namespace ApiBradesco\Test;
 
 use PHPUnit\Framework\TestCase;
 use BradescoApi\Http\Bradesco;
-use BradescoApi\Exceptions\BradescoClientException;
 
 class BradescoTest extends TestCase
 {
