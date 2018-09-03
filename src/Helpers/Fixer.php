@@ -82,6 +82,17 @@ class Fixer
         'municipioPagador'
     ];
 
+    protected static $clipTextields = [
+        ['nuCliente', 10],
+        ['controleParticipante', 25],
+        ['nomePagador', 70],
+        ['logradouroPagador', 40],
+        ['complementoLogradouroPagador', 15],
+        ['bairroPagador', 40],
+        ['municipioPagador', 30],
+        ['ufPagador', 2]
+    ];
+
     public static function mergeWithDefaultData(array &$data)
     {
         $data = array_merge(static::$defaultBankSlip, $data);
@@ -107,6 +118,13 @@ class Fixer
         foreach(static::$textFields as $field) {
             if (!isset($data[$field])) continue;
             $data[$field] = Formatter::formatText($data[$field]);
+        }
+
+        foreach(static::$clipTextields as $rule) {
+            $field  = reset($rule);
+            $clip   = end($rule);
+            if (!isset($data[$field])) continue;
+            $data[$field] = Formatter::clipText($data[$field], $clip);
         }
     }
 

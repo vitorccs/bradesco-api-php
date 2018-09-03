@@ -78,6 +78,16 @@ class Formatter
 
         return $value;
     }
+
+    // expected format: clip text up to max chars allowed
+    public static function clipText($value, int $clip)
+    {
+        if (!is_string($value) || strlen($value) <= $clip) {
+            return $value;
+        }
+
+        return substr($value, 0, $clip);
+    }
 }
 
 ?>

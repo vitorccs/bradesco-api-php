@@ -39,6 +39,7 @@ Foram adicionadas diversas funções para normalizar os dados conforme exigido p
 * Valores em `null` são trocados para vazio "".
 * Valores em `integer` ou `float` são convertidos para string.
 * Valores com caracteres especiais (ção) são substituídos por caracteres básicos (cao).
+* Valores de nome e endereço do pagador são recortados para a quantidade máxima de caracteres.
 * Datas no formato "yyyy-mm-dd" ou "dd/mm/yyy" são normalizadas para "dd.mm.yyyy".
 * Moedas no formato 14.90 ou "14,90" são normalizadas para "1490".
 * Números de CPF e CNPJ "123.456.789-01" são normalizadas para "00012345678901".
