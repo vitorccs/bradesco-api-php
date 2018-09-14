@@ -22,7 +22,7 @@ class Bradesco
     private static $folderPath    = null;
     private static $sandboxUrl    = 'https://cobranca.bradesconetempresa.b.br/ibpjregistrotitulows/registrotitulohomologacao';
     private static $productionUrl = 'https://cobranca.bradesconetempresa.b.br/ibpjregistrotitulows/registrotitulo';
-    private static $sdkVersion    = "1.3.1";
+    private static $sdkVersion    = "1.3.3";
 
     public static function setIsSandbox(bool $enable = null)
     {
