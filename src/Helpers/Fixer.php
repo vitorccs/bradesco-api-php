@@ -79,7 +79,14 @@ class Fixer
         'logradouroPagador',
         'complementoLogradouroPagador',
         'bairroPagador',
-        'municipioPagador'
+        'municipioPagador',
+        'ufPagador',
+        'nomeSacadorAvalista',
+        'logradouroSacadorAvalista',
+        'complementoLogradouroSacadorAvalista',
+        'bairroSacadorAvalista',
+        'municipioSacadorAvalista',
+        'ufSacadorAvalista'
     ];
 
     protected static $clipTextields = [
@@ -90,7 +97,13 @@ class Fixer
         ['complementoLogradouroPagador', 15],
         ['bairroPagador', 40],
         ['municipioPagador', 30],
-        ['ufPagador', 2]
+        ['ufPagador', 2],
+        ['nomeSacadorAvalista', 40],
+        ['logradouroSacadorAvalista', 40],
+        ['complementoLogradouroSacadorAvalista', 15],
+        ['bairroSacadorAvalista', 40],
+        ['municipioSacadorAvalista', 40],
+        ['ufSacadorAvalista', 2]
     ];
 
     public static function mergeWithDefaultData(array &$data)

@@ -9,6 +9,31 @@ class Formatter
         return preg_replace("/[^0-9]/", '', (string) $value);
     }
 
+    // remove latin special chars
+    public static function basicLatin($value)
+    {
+        $rules = [
+            ['[ãáàâ]', 'a'],
+            ['[ÃÁÀÂ]', 'A'],
+            ['[ẽéèê]', 'e'],
+            ['[ẼÉÈÊ]', 'E'],
+            ['[ĩíìî]', 'i'],
+            ['[ĨÍÌÎ]', 'I'],
+            ['[õóòô]', 'o'],
+            ['[ÕÓÒÔ]', 'O'],
+            ['[ũúùû]', 'u'],
+            ['[ŨÚÙÛ]', 'U'],
+            ['[ç]', 'c'],
+            ['[Ç]', 'C']
+        ];
+
+        foreach ($rules as $rule) {
+            $value = preg_replace('/'. $rule[0] . '/u', $rule[1], $value);
+        }
+
+        return $value;
+    }
+
     // expected format: no decimal and thousand separators
     public static function formatCurrency($value)
     {
@@ -57,24 +82,9 @@ class Formatter
     // expected format: no special chars, API has trouble processing them
     public static function formatText($value)
     {
-        $rules = [
-            ['[ãáàâ]', 'a'],
-            ['[ÃÁÀÂ]', 'A'],
-            ['[ẽéèê]', 'e'],
-            ['[ẼÉÈÊ]', 'E'],
-            ['[ĩíìî]', 'i'],
-            ['[ĨÍÌÎ]', 'I'],
-            ['[õóòô]', 'o'],
-            ['[ÕÓÒÔ]', 'O'],
-            ['[ũúùû]', 'u'],
-            ['[ŨÚÙÛ]', 'U'],
-            ['[ç]', 'c'],
-            ['[Ç]', 'C']
-        ];
-
-        foreach ($rules as $rule) {
-            $value = preg_replace('/'. $rule[0] . '/u', $rule[1], $value);
-        }
+        $value = (string) $value;
+        $value = static::basicLatin($value);
+        $value = preg_replace("/[^0-9a-z \-]/i", '', $value);
 
         return $value;
     }
@@ -82,12 +92,13 @@ class Formatter
     // expected format: clip text up to max chars allowed
     public static function clipText($value, int $clip)
     {
-        if (!is_string($value) || strlen($value) <= $clip) {
-            return $value;
+        $value = (string) $value;
+
+        if (strlen($value) > $clip) {
+            $value = substr($value, 0, $clip);
         }
 
-        return substr($value, 0, $clip);
+        return $value;
     }
 }
-
 ?>
