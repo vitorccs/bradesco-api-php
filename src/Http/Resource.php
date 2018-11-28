@@ -5,10 +5,15 @@ abstract class Resource
 {
     protected static $api = null;
 
+    public static function reconfig()
+    {
+        static::$api = new Api();
+    }
+
     public static function api()
     {
         if (is_null(static::$api)) {
-            static::$api = new Api();
+            static::reconfig();
         }
 
         return static::$api;

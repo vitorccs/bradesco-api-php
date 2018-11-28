@@ -5,29 +5,25 @@ namespace ApiBradesco\Test;
 
 use PHPUnit\Framework\TestCase;
 use BradescoApi\BankSlip;
-use BradescoApi\Exceptions\BradescoValidationException;
+use BradescoApi\Exceptions\BradescoApiException;
+use BradescoApi\Exceptions\BradescoRequestException;
+use BradescoApi\Http\Bradesco;
 
 class BankSlipTest extends TestCase
 {
-    /**
-     * @test
-     * @expectedException        BradescoApi\Exceptions\BradescoValidationException
-     * @expectedExceptionMessage Contrato não encontrado (-2)
-     */
-    public function it_should_get_contract_not_found()
-    {
-        $data = [];
-        $bankSlip = BankSlip::create($data);
-    }
+    protected $data = [];
 
-    /**
-     * @test
-     */
-    public function it_should_register_bank_slip()
+    public function setUp()
     {
-        $data               = (array) json_decode(getenv('DATA'));
+        $userData    = (array) json_decode(getenv('DATA'));
 
-        $defaultData        = [
+        $defaultData = [
+            "idProduto"             => "09",
+            "nuCliente"             => "123456",
+            "dtEmissaoTitulo"       => date('Y-m-d'),
+            "dtVencimentoTitulo"    => date('Y-m-d'),
+            "vlNominalTitulo"       => 10,
+            "cdEspecieTitulo"       => "1",
             "nomePagador"           => "Cliente Teste",
             "logradouroPagador"     => "Rua Teste",
             "nuLogradouroPagador"   => "90",
@@ -40,13 +36,42 @@ class BankSlipTest extends TestCase
             "nuCpfcnpjPagador"      => "00087912543023"
         ];
 
-        $data               = array_merge($defaultData, $data);
+        $this->data = array_merge($defaultData, $userData);
+    }
 
-        $bankSlip           = BankSlip::create($data);
+    /**
+     * @test
+     */
+    public function it_should_register_bank_slip()
+    {
+        $bankSlip           = BankSlip::create($this->data);
 
         $errorCode          = $bankSlip->cdErro ?? 0;
         $success            = ($errorCode == 0);
 
         $this->assertTrue($success);
+    }
+
+    /**
+     * @test
+     * @expectedException        BradescoApi\Exceptions\BradescoApiException
+     * @expectedExceptionMessage Contrato não encontrado
+     */
+    public function it_should_get_api_exception()
+    {
+        $data = [];
+        $bankSlip = BankSlip::create($data);
+    }
+
+    /**
+     * @test
+     * @expectedException        BradescoApi\Exceptions\BradescoRequestException
+     */
+    public function it_should_get_request_exception()
+    {
+        Bradesco::setApiUrl('https://cobranca.bradesconetempresa.b.br/INVALID');
+        BankSlip::reconfig();
+
+        $bankSlip = BankSlip::create($this->data);
     }
 }

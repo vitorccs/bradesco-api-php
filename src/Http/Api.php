@@ -4,7 +4,7 @@ namespace BradescoApi\Http;
 use Psr\Http\Message\ResponseInterface;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\RequestException;
-use BradescoApi\Exceptions\BradescoValidationException;
+use BradescoApi\Exceptions\BradescoApiException;
 use BradescoApi\Exceptions\BradescoRequestException;
 
 class Api
@@ -64,45 +64,40 @@ class Api
 
     private function checkForErrors(ResponseInterface $response, \stdClass $data)
     {
-        $code           = $response->getStatusCode();
-        $statusClass    = (int) ($code / 100);
+        // NOTE: All API errors are received as 200 OK
+        // (not in accordance with RESTful specs)
+        $this->checkForApiException($data);
 
-        // Not in accordante to REST API specification:
-        // Request errors are received as "200 OK" rather than
-        // "400 Bad Request" or "422 Unprocessable Entity"
-        $this->BradescoValidationException($data);
-
-        if ($statusClass === 4 || $statusClass === 5) {
-            $this->checkForRequestException($response);
-        }
+        $this->checkForRequestException($response);
     }
 
-    private function BradescoValidationException(\stdClass $data)
+    private function checkForApiException(\stdClass $data)
     {
-        $code    = $data->cdErro ?? 0;
-        $reason  = $data->msgErro ?? 'Unknown error';
+        $code     = (int) ($data->cdErro ?? 0);
+        $message  = $data->msgErro ?? 'Undefined error';
 
-        if (!$code) return;
+        if ($code === 0) return;
 
         // Bradesco API issue
         // Fixes text of 'CdErro' field, which contains double enconded
         // HTML entities ("&amp;atilde;" rather than "&atilde;")
-        $reason = html_entity_decode($reason);
-        $reason = html_entity_decode($reason);
+        $message = html_entity_decode($message);
+        $message = html_entity_decode($message);
 
-        $message = "{$reason} ($code)";
-
-        throw new BradescoValidationException($message);
+        throw new BradescoApiException($message, $code);
     }
 
     private function checkForRequestException(ResponseInterface $response)
     {
-        $code    = $response->getStatusCode();
-        $reason  = $response->getReasonPhrase();
+        $code           = $response->getStatusCode();
+        $message        = $response->getReasonPhrase();
+        $statusClass    = (int) ($code / 100);
 
-        $message = "{$reason} ($code)";
+        if ($statusClass !== 4 && $statusClass !== 5) {
+            return;
+        }
 
-        throw new BradescoRequestException($message);
+        throw new BradescoRequestException($message, $code);
     }
 
     public function encryptBodyData($params)

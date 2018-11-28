@@ -36,8 +36,8 @@ class Bradesco
             static::$sandbox = static::$defIsSandbox;
         }
 
-        if (strtolower(static::$sandbox) === "false") {
-            static::$sandbox = false;
+        if (is_string(static::$sandbox)) {
+            static::$sandbox = (bool) static::$sandbox;
         }
     }
 
