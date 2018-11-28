@@ -37,7 +37,7 @@ class Bradesco
         }
 
         if (is_string(static::$sandbox)) {
-            static::$sandbox = (bool) static::$sandbox;
+            static::$sandbox = (static::$sandbox == 'false' ? false : true);
         }
     }
 
