@@ -21,9 +21,10 @@
         </whitelist>
     </filter>
     <php>
+        <env name="BRADESCO_SANDBOX" value="true"/>
         <env name="BRADESCO_TIMEOUT" value="20"/>
         <env name="BRADESCO_CERT_PATH" value="myCertificate.pfx"/>
         <env name="BRADESCO_CERT_PASSWORD" value="myPassword"/>
-        <env name="DATA" value='{"nuCPFCNPJ":"123456789","filialCPFCNPJ":"0001","ctrlCPFCNPJ":"39","cdTipoAcesso":"2","idProduto":"09","nuNegociacao":"123400000001234567","nuCliente":"123456","dtEmissaoTitulo":"29\/08\/2018","dtVencimentoTitulo":"2018-09-03","vlNominalTitulo":10,"nuTitulo":"76","cdEspecieTitulo":"1"}' />
+        <env name="DATA" value='{"nuCPFCNPJ":"","ctrlCPFCNPJ":"","filialCPFCNPJ":"","nuNegociacao":""}' />
     </php>
 </phpunit>

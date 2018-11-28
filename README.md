@@ -57,6 +57,9 @@ putenv('BRADESCO_TIMEOUT=20');
 putenv('BRADESCO_CERT_PATH=myCertificate.pfx');
 putenv('BRADESCO_CERT_PASSWORD=myPassword');
 
+use BradescoApi\Exceptions\BradescoApiException;
+use BradescoApi\Exceptions\BradescoRequestException;
+
 $data = [
   "nuCPFCNPJ" => "123456789",
   "filialCPFCNPJ" => "0001",
@@ -83,7 +86,11 @@ $data = [
 try {
     $bankSlip = \BradescoApi\BankSlip::create($data);
     print_r($bankSlip);
-} catch (\Exception $e) {
+} catch (BradescoApiException $e) { // erros retornados pela API Bradesco
+    echo $e->getMessage().', CdErro:'. $e->getCode();
+} catch (BradescoRequestException $e) { // erros de servidor (erros HTTP 400 e 500)
+    echo $e->getMessage().', Erro HTTP:'. $e->getCode();
+} catch (\Exception $e) { // demais erros
     echo $e->getMessage();
 }
 ```
