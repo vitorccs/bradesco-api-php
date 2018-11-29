@@ -87,9 +87,9 @@ try {
     $bankSlip = \BradescoApi\BankSlip::create($data);
     print_r($bankSlip);
 } catch (BradescoApiException $e) { // erros retornados pela API Bradesco
-    echo $e->getMessage().', CdErro:'. $e->getErrorCode();
+    echo sprintf("%s (%s)", $e->getMessage(), $e->getErrorCode());
 } catch (BradescoRequestException $e) { // erros de servidor (erros HTTP 4xx e 5xx)
-    echo $e->getMessage().', Erro HTTP:'. $e->getErrorCode();
+    eecho sprintf("%s (%s)", $e->getMessage(), $e->getErrorCode());
 } catch (\Exception $e) { // demais erros
     echo $e->getMessage();
 }
