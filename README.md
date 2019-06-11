@@ -36,7 +36,7 @@ putenv('BRADESCO_CERT_PASSWORD=myPassword');
 
 ou passados por `array`:
 ```php
-Bradesco::setParams([
+\BradescoApi\Http\Bradesco::setParams([
     'BRADESCO_SANDBOX' => true,
     'BRADESCO_TIMEOUT' => 20,
     'BRADESCO_CERT_PATH' => 'myCertificate.pfx',
