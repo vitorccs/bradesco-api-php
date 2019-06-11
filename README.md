@@ -16,9 +16,7 @@ composer require vitorccs/bradesco-api-php
 ```
 
 
-## Variáveis de ambiente
-Os seguintes parâmetros devem ser informados:
-
+## Parâmetros
 Parâmetro | Obrigatório | Padrão | Comentário
 ------------ | ------------- | ------------- | -------------
 BRADESCO_CERT_PATH | Sim | null | Caminho do certificado PKCS#7 em formato .pfx
@@ -28,7 +26,25 @@ BRADESCO_TIMEOUT | Não | 30 | Timeout em segundos para estabelecer conexão com
 BRADESCO_FOLDER_PATH | Não | "" | Caminho para esta biblioteca gerar arquivos temporários, necessários parar realizar a criptografia. Os arquivos são criados com hash randômica e excluídos automaticamente, sem a necessidade de se preocupar em limpá-los periodicamente.
 
 ## Como usar
-Após definir as variáveis de ambiente acima, basta utilizar o comando abaixo passando os dados do boleto a registrar em formato `array`.
+1) Os parâmetros podem ser definidos por váriaveis de ambiente:
+```php
+putenv('BRADESCO_SANDBOX=true');
+putenv('BRADESCO_TIMEOUT=20');
+putenv('BRADESCO_CERT_PATH=myCertificate.pfx');
+putenv('BRADESCO_CERT_PASSWORD=myPassword');
+```
+
+ou passados por `array`:
+```php
+Bradesco::setParams([
+    'BRADESCO_SANDBOX' => true,
+    'BRADESCO_TIMEOUT' => 20,
+    'BRADESCO_CERT_PATH' => 'myCertificate.pfx',
+    'BRADESCO_CERT_PASSWORD' => 'myPassword'
+]);
+```
+
+2) Em seguida, basta utilizar o comando abaixo passando os dados do boleto em formato `array`.
 ```php
 $boleto = \BradescoApi\BankSlip::create($data);
 ```

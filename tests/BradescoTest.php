@@ -60,4 +60,30 @@ class BradescoTest extends TestCase
 
         $this->assertEquals($bradescoValue, $envValue);
     }
+
+    /** @test */
+    public function it_should_set_by_params()
+    {
+        // set random value
+        $params = [
+            Bradesco::TIMEOUT => '60',
+            Bradesco::CERT_PATH => 'BRADESCO_CERT_PATH',
+            Bradesco::CERT_PASSWORD => 'BRADESCO_CERT_PASSWORD',
+            Bradesco::FOLDER_PATH => 'BRADESCO_FOLDER_PATH'
+        ];
+        Bradesco::setParams($params);
+        $this->assertEquals(Bradesco::getTimeout(), $params[Bradesco::TIMEOUT]);
+        $this->assertEquals(Bradesco::getCertPath(), $params[Bradesco::CERT_PATH]);
+        $this->assertEquals(Bradesco::getCertPassword(), $params[Bradesco::CERT_PASSWORD]);
+        $this->assertEquals(Bradesco::getFolderPath(), $params[Bradesco::FOLDER_PATH]);
+
+        // rollback
+        $params = [
+            'BRADESCO_TIMEOUT' => getenv(Bradesco::TIMEOUT),
+            'BRADESCO_CERT_PATH' => getenv(Bradesco::CERT_PATH),
+            'BRADESCO_CERT_PASSWORD' => getenv(Bradesco::CERT_PASSWORD),
+            'BRADESCO_FOLDER_PATH' => getenv(Bradesco::FOLDER_PATH)
+        ];
+        Bradesco::setParams($params);
+    }
 }

@@ -14,15 +14,40 @@ class Bradesco
     private static $apiUrl        = null;
     private static $sandbox       = null;
     private static $timeout       = null;
-
-    private static $defIsSandbox  = true;
-    private static $defTimeout    = 30;
     private static $certPath      = null;
     private static $certPassword  = null;
     private static $folderPath    = null;
+
+    private static $defIsSandbox  = true;
+    private static $defTimeout    = 30;
+    private static $defFolderPath = '';
+
     private static $sandboxUrl    = 'https://cobranca.bradesconetempresa.b.br/ibpjregistrotitulows/registrotitulohomologacao';
     private static $productionUrl = 'https://cobranca.bradesconetempresa.b.br/ibpjregistrotitulows/registrotitulo';
-    private static $sdkVersion    = "1.3.3";
+    private static $sdkVersion    = "1.3.4";
+
+    public static function setParams(array $params)
+    {
+        if (isset($params[static::SANDBOX])) {
+            static::setIsSandbox($params[static::SANDBOX]);
+        }
+
+        if (isset($params[static::TIMEOUT])) {
+            static::setTimeout($params[static::TIMEOUT]);
+        }
+
+        if (isset($params[static::CERT_PATH])) {
+            static::setCertPath($params[static::CERT_PATH]);
+        }
+
+        if (isset($params[static::CERT_PASSWORD])) {
+            static::setCertPassword($params[static::CERT_PASSWORD]);
+        }
+
+        if (isset($params[static::FOLDER_PATH])) {
+            static::setFolderPath($params[static::FOLDER_PATH]);
+        }
+    }
 
     public static function setIsSandbox(bool $enable = null)
     {
@@ -103,7 +128,7 @@ class Bradesco
         }
 
         if (static::$folderPath === false) {
-            static::$folderPath = '';
+            static::$folderPath = static::$defFolderPath;
         }
     }
 
