@@ -103,7 +103,7 @@ try {
 } catch (BradescoApiException $e) { // erros retornados pela API Bradesco
     echo sprintf("%s (%s)", $e->getMessage(), $e->getErrorCode());
 } catch (BradescoRequestException $e) { // erros de servidor (erros HTTP 4xx e 5xx)
-    eecho sprintf("%s (%s)", $e->getMessage(), $e->getErrorCode());
+    echo sprintf("%s (%s)", $e->getMessage(), $e->getErrorCode());
 } catch (\Exception $e) { // demais erros
     echo $e->getMessage();
 }

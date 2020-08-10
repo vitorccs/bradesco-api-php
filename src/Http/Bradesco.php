@@ -24,7 +24,7 @@ class Bradesco
 
     private static $sandboxUrl    = 'https://cobranca.bradesconetempresa.b.br/ibpjregistrotitulows/registrotitulohomologacao';
     private static $productionUrl = 'https://cobranca.bradesconetempresa.b.br/ibpjregistrotitulows/registrotitulo';
-    private static $sdkVersion    = "1.3.4";
+    private static $sdkVersion    = "1.5.0";
 
     public static function setParams(array $params)
     {
@@ -55,10 +55,10 @@ class Bradesco
 
         if (static::$sandbox === null) {
             static::$sandbox = getenv(static::SANDBOX);
-        }
 
-        if (static::$sandbox === false) {
-            static::$sandbox = static::$defIsSandbox;
+            if (static::$sandbox === false) {
+                static::$sandbox = static::$defIsSandbox;
+            }
         }
 
         if (is_string(static::$sandbox)) {
