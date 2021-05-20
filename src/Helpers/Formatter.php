@@ -101,4 +101,4 @@ class Formatter
         return $value;
     }
 }
-?>
+

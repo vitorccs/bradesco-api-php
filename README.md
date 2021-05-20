@@ -101,13 +101,21 @@ try {
     $bankSlip = \BradescoApi\BankSlip::create($data);
     print_r($bankSlip);
 } catch (BradescoApiException $e) { // erros retornados pela API Bradesco
+    echo $e->getErrorCode() == 69
+         ? "Boleto já registrado"
+         : sprintf("%s (%s)", $e->getMessage(), $e->getErrorCode());
+} catch (BradescoRequestException $e) { // erros não tratados (erros HTTP 4xx e 5xx)
     echo sprintf("%s (%s)", $e->getMessage(), $e->getErrorCode());
-} catch (BradescoRequestException $e) { // erros de servidor (erros HTTP 4xx e 5xx)
-    echo sprintf("%s (%s)", $e->getMessage(), $e->getErrorCode());
-} catch (\Exception $e) { // demais erros
+} catch (\Exception $e) { // outros erros
     echo $e->getMessage();
 }
 ```
+
+## Dicas
+* Mesmo em ambiente Sandbox, é necessário utilizar os dados reais do beneficiário (nuCPFCNPJ, filialCPFCNPJ, ctrlCPFCNPJ, nuNegociacao)
+* Como qualquer serviço, a API do Bradesco não consegue alcançar 100% de disponibilidade. É recomendável armazenar o status de sucesso, e algum tratamento de retentativa para aquelas que não retornaram sucesso.
+* Esta biblioteca verifica a resposta da API do Bradesco, e se não obtiver a confirmação de sucesso (campo CdErro), sempre irá retornar algum tipo de Exception
+* A única exceção 
 
 ## Testes
 Caso queira contribuir, por favor, implementar testes de unidade em PHPUnit.

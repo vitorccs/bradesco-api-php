@@ -189,5 +189,3 @@ class Fixer
         static::setCustomerType($data);
     }
 }
-
-?>

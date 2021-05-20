@@ -1,22 +1,45 @@
 <?php
+
 namespace BradescoApi\Http;
 
 use Psr\Http\Message\ResponseInterface;
-use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\RequestException;
 use BradescoApi\Exceptions\BradescoApiException;
 use BradescoApi\Exceptions\BradescoRequestException;
 
 class Api
 {
+    /**
+     * @var Client
+     */
     protected $client;
 
+    /**
+     * The success code value for 'cdErro' field
+     */
+    const SUCCESS_CODE = 0;
+
+    /**
+     * The error code value in case Bradesco API returns an empty body
+     */
+    const EMPTY_BODY_CODE = -100;
+
+    /**
+     * Api constructor.
+     */
     public function __construct()
     {
         $this->client = new Client();
     }
 
-    public function post(array $params = [], string $endpoint = null)
+    /**
+     * @param array $params
+     * @param string|null $endpoint
+     * @return \stdClass
+     * @throws BradescoRequestException
+     * @throws BradescoApiException
+     */
+    public function post(array $params = [], string $endpoint = null): \stdClass
     {
         $options = [
             'body' => $this->encryptBodyData($params)
@@ -25,7 +48,15 @@ class Api
         return $this->request('POST', $endpoint, $options);
     }
 
-    private function request(string $method, string $endpoint = null, array $options = [])
+    /**
+     * @param string $method
+     * @param string|null $endpoint
+     * @param array $options
+     * @return \stdClass
+     * @throws BradescoApiException
+     * @throws BradescoRequestException
+     */
+    private function request(string $method, string $endpoint = null, array $options = []): \stdClass
     {
         try {
             $response = $this->client->request($method, $endpoint, $options);
@@ -40,7 +71,13 @@ class Api
         return $this->response($response);
     }
 
-    private function response(ResponseInterface $response)
+    /**
+     * @param ResponseInterface $response
+     * @return \stdClass|null
+     * @throws BradescoApiException
+     * @throws BradescoRequestException
+     */
+    private function response(ResponseInterface $response): ?\stdClass
     {
         $content = $response->getBody()->getContents();
 
@@ -51,7 +88,11 @@ class Api
         return $data;
     }
 
-    private function soapToJson(string $content)
+    /**
+     * @param string $content
+     * @return \stdClass|null
+     */
+    private function soapToJson(string $content): ?\stdClass
     {
         $data = "{}";
 
@@ -62,24 +103,34 @@ class Api
         return json_decode($data);
     }
 
-    private function checkForErrors(ResponseInterface $response, \stdClass $data)
+    /**
+     * @param ResponseInterface $response
+     * @param \stdClass|null $data
+     * @throws BradescoApiException
+     * @throws BradescoRequestException
+     */
+    private function checkForErrors(ResponseInterface $response, ?\stdClass $data = null)
     {
         // NOTE: All API errors are received as 200 OK
         // (not in accordance with RESTful specs)
         $this->checkForApiException($data);
 
-        $this->checkForRequestException($response);
+        $this->checkForRequestException($response, $data);
     }
 
-    private function checkForApiException(\stdClass $data)
+    /**
+     * @param \stdClass|null $data
+     * @throws BradescoApiException
+     */
+    private function checkForApiException(?\stdClass $data = null)
     {
-        $code     = (int) ($data->cdErro ?? 0);
-        $message  = $data->msgErro ?? 'Undefined error';
+        $code = (int)($data->cdErro ?? null);
+        $message = $data->msgErro ?? 'Unknown error';
 
-        if ($code === 0) return;
+        if ($code === self::SUCCESS_CODE) return;
 
         // Bradesco API issue
-        // Fixes text of 'CdErro' field, which contains double enconded
+        // Fixes text of 'CdErro' field, which contains double encoded
         // HTML entities ("&amp;atilde;" rather than "&atilde;")
         $message = html_entity_decode($message);
         $message = html_entity_decode($message);
@@ -87,33 +138,47 @@ class Api
         throw new BradescoApiException($message, $code);
     }
 
-    private function checkForRequestException(ResponseInterface $response)
+    /**
+     * @param ResponseInterface $response
+     * @param \stdClass|null $data
+     * @throws BradescoRequestException
+     */
+    private function checkForRequestException(ResponseInterface $response, ?\stdClass $data = null)
     {
-        $code           = $response->getStatusCode();
-        $message        = $response->getReasonPhrase();
-        $statusClass    = (int) ($code / 100);
+        $code = $response->getStatusCode();
+        $message = $response->getReasonPhrase();
 
-        if ($statusClass !== 4 && $statusClass !== 5) {
-            return;
+        $statusClass = (int)($code / 100);
+        $isHttpError = $statusClass === 4 || $statusClass === 5;
+
+        if (!$isHttpError && !is_null($data)) return;
+
+        if (is_null($data)) {
+            $message = 'Bradesco returned an empty Body';
+            $code = self::EMPTY_BODY_CODE;
         }
 
         throw new BradescoRequestException($message, $code);
     }
 
-    public function encryptBodyData($params)
+    /**
+     * @param array $params
+     * @return string
+     */
+    public function encryptBodyData(array $params): string
     {
         // Bradesco API issue
         // Do not escape special chars to Unicode since Bradesco API
         // does not decode them and Bank Slips are issued with
         // strange chars like "Jo\u00e3o"
-        $message      = json_encode($params, JSON_UNESCAPED_UNICODE);
+        $message = json_encode($params, JSON_UNESCAPED_UNICODE);
 
-        $certKey      = $this->client->getCertKey();
-        $privateKey   = $this->client->getPrivateKey();
-        $folderPath   = $this->client->getFolderPath();
+        $certKey = $this->client->getCertKey();
+        $privateKey = $this->client->getPrivateKey();
+        $folderPath = $this->client->getFolderPath();
 
-        $msgFile      = $folderPath . uniqid('jsonFile', true);
-        $signedFile   = $folderPath . uniqid('signedFile', true);
+        $msgFile = $folderPath . uniqid('jsonFile', true);
+        $signedFile = $folderPath . uniqid('signedFile', true);
 
         file_put_contents($msgFile, $message);
 
@@ -121,8 +186,8 @@ class Api
             $msgFile, $signedFile, $certKey, $privateKey, [], PKCS7_BINARY | PKCS7_TEXT
         );
 
-        $signature  = file_get_contents($signedFile);
-        $parts      = preg_split("#\n\s*\n#Uis", $signature);
+        $signature = file_get_contents($signedFile);
+        $parts = preg_split("#\n\s*\n#Uis", $signature);
 
         $signedMessageBase64 = $parts[1];
 
