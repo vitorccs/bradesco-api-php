@@ -34,24 +34,35 @@ class ParameterTest extends TestCase
             Bradesco::CERT_PASSWORD => getenv(Bradesco::CERT_PASSWORD),
             Bradesco::FOLDER_PATH => getenv(Bradesco::FOLDER_PATH)
         ];
+
+        static::resetEnv();
     }
 
-    /**
-     * Runs before each test
-     */
-    public function setUp()
+    public function testCertPathIsRequired()
     {
-        Bradesco::setParams(static::$backupParams);
+        $this->expectException(BradescoParameterException::class);
+        $this->expectExceptionMessage("Missing required parameter 'CERT_PATH'");
+
+        Bradesco::setCertPath();
+        BankSlip::reconfig();
+        BankSlip::create(static::$data);
     }
 
-    public function 
+    public function testCertPasswordIsRequired()
+    {
+        $this->expectException(BradescoParameterException::class);
+        $this->expectExceptionMessage("Missing required parameter 'CERT_PASSWORD'");
+
+        Bradesco::setCertPassword();
+        BankSlip::reconfig();
+        BankSlip::create(static::$data);
+    }
 
     public function testInvalidCertPassword()
     {
         $this->expectException(BradescoParameterException::class);
 
         Bradesco::setCertPassword('INVALID');
-
         BankSlip::reconfig();
         BankSlip::create(static::$data);
     }
@@ -61,8 +72,17 @@ class ParameterTest extends TestCase
         $this->expectException(BradescoParameterException::class);
 
         Bradesco::setCertPath('INVALID');
-
         BankSlip::reconfig();
         BankSlip::create(static::$data);
+    }
+
+    /**
+     * Reset env parameters to empty
+     */
+    public static function resetEnv()
+    {
+        foreach (static::$backupParams as $key => $value) {
+            putenv($key);
+        }
     }
 }

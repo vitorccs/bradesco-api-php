@@ -1,16 +1,47 @@
 <?php
+
 namespace BradescoApi\Helpers;
 
 class Formatter
 {
-    // remove non numeric chars
-    public static function cleanNumeric($value)
+    /**
+     * Remove non numeric chars
+     *
+     * @param string|int $value
+     * @return string
+     */
+    public static function cleanNumeric($value): string
     {
         return preg_replace("/[^0-9]/", '', (string) $value);
     }
 
-    // remove latin special chars
-    public static function basicLatin($value)
+    /**
+     * Clip text up to max chars allowed
+     *
+     * @param string|int $value
+     * @param int $clip
+     * @return string
+     */
+    public static function clipText($value, int $clip): string
+    {
+        $value = (string) $value;
+
+        if (strlen($value) > $clip) {
+            $value = substr($value, 0, $clip);
+        }
+
+        return $value;
+    }
+
+    /**
+     * Format text per Bradesco specs:
+     * Transliterate the string into an ASCII value
+     * (other chars may cause unexpected behaviour with Bradesco API)
+     *
+     * @param string $value
+     * @return array|string|string[]|null
+     */
+    public static function formatAscii(string $value): string
     {
         $rules = [
             ['[ãáàâ]', 'a'],
@@ -34,8 +65,14 @@ class Formatter
         return $value;
     }
 
-    // expected format: no decimal and thousand separators
-    public static function formatCurrency($value)
+    /**
+     * Format number per Bradesco specs:
+     * Without thousand and decimal separators
+     *
+     * @param $value
+     * @return string
+     */
+    public static function formatCurrency($value): string
     {
         if (is_float($value) || is_int($value)) {
             $value = number_format($value, 2, "", "");
@@ -46,7 +83,13 @@ class Formatter
         return $value;
     }
 
-    // expected format: ddmmyyyy
+    /**
+     * Format date per Bradesco specs:
+     * dd.mm.yyyy
+     *
+     * @param $value
+     * @return \DateTime|false|mixed|string
+     */
     public static function formatDate($value)
     {
         // remove the time part
@@ -69,36 +112,32 @@ class Formatter
         return $value;
     }
 
-    // expected format: no dots and slashes, with 14 leading zeros
-    public static function formatCpfCnpj($value)
+    /**
+     * Format CPF/CNPJ per Bradesco specs:
+     * Only numeric chars with 14 leading zeros
+     *
+     * @param string|int $value
+     * @return string
+     */
+    public static function formatCpfCnpj($value): string
     {
         $value = static::cleanNumeric($value);
 
-        $value = str_pad($value, 14, '0', STR_PAD_LEFT);
-
-        return $value;
+        return str_pad($value, 14, '0', STR_PAD_LEFT);
     }
 
-    // expected format: no special chars, API has trouble processing them
-    public static function formatText($value)
+    /**
+     * Format CPF/CNPJ per Bradesco specs:
+     * Only alphanumeric chars plus space and slash
+     *
+     * @param $value
+     * @return string
+     */
+    public static function formatAlpha($value): string
     {
         $value = (string) $value;
-        $value = static::basicLatin($value);
-        $value = preg_replace("/[^0-9a-z \-]/i", '', $value);
-
-        return $value;
-    }
-
-    // expected format: clip text up to max chars allowed
-    public static function clipText($value, int $clip)
-    {
-        $value = (string) $value;
-
-        if (strlen($value) > $clip) {
-            $value = substr($value, 0, $clip);
-        }
-
-        return $value;
+        $value = static::formatAscii($value);
+        return preg_replace("/[^0-9a-z \-]/i", '', $value);
     }
 }
 
