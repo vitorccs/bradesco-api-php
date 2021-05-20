@@ -1,6 +1,8 @@
 # Bradesco API - SDK PHP
 SDK PHP para a API de Registro On-line de Boletos de Cobrança Bradesco
 
+## Requisitos
+* PHP >= 7.1
 
 ## Descrição
 SDK em PHP para integração com os serviços de Registro On-line de Boletos de Cobrança Bradesco
@@ -17,8 +19,8 @@ composer require vitorccs/bradesco-api-php
 ## Parâmetros
 Parâmetro | Obrigatório | Padrão | Comentário
 ------------ | ------------- | ------------- | -------------
-BRADESCO_CERT_PATH | Sim | null | Caminho do certificado PKCS#7 em formato .pfx
-BRADESCO_CERT_PASSWORD | Sim | null | Senha do certificado
+BRADESCO_CERT_PATH | Sim | - | Caminho do certificado PKCS#7 em formato .pfx
+BRADESCO_CERT_PASSWORD | Sim | - | Senha do certificado
 BRADESCO_SANDBOX | Não | true | Utilizar ambiente de Homologação (true) ou Produção (false)
 BRADESCO_TIMEOUT | Não | 30 | Timeout em segundos para estabelecer conexão com a API
 BRADESCO_FOLDER_PATH | Não | "" | Caminho para esta biblioteca gerar arquivos temporários, necessários parar realizar a criptografia. Os arquivos são criados com hash randômica e excluídos automaticamente, sem a necessidade de se preocupar em limpá-los periodicamente.
@@ -101,13 +103,21 @@ try {
     $bankSlip = \BradescoApi\BankSlip::create($data);
     print_r($bankSlip);
 } catch (BradescoApiException $e) { // erros retornados pela API Bradesco
-    echo sprintf("%s (%s)", $e->getMessage(), $e->getErrorCode());
-} catch (BradescoRequestException $e) { // erros de servidor (erros HTTP 4xx e 5xx)
+    echo $e->getErrorCode() == 69 // este é o único código de erro que não exige tratativa
+         ? "API Bradesco indica que boleto já foi registrado"
+         : sprintf("%s (%s)", $e->getMessage(), $e->getErrorCode());
+} catch (BradescoRequestException $e) { // erros não tratados (erros HTTP 4xx e 5xx)
     echo sprintf("%s (%s)", $e->getMessage(), $e->getErrorCode());
 } catch (\Exception $e) { // demais erros
     echo $e->getMessage();
 }
 ```
+
+## Dicas
+* Mesmo em ambiente Sandbox é necessário utilizar o arquivo e senha correta do certificado, e utilizar os dados reais do beneficiário (nuCPFCNPJ, filialCPFCNPJ, ctrlCPFCNPJ, nuNegociacao). Também é necessário que a sua carteira de boletos já esteja autorizada junto ao Bradesco para utilizar a API de Registro On-line.
+* Como qualquer serviço, a API do Bradesco não possui 100% de disponibilidade. É recomendável armazenar o status de sucesso, e prever algum tratamento de retentativa para os casos que não retornaram sucesso.
+* A exceção BradescoApiException é lançada quando é detectado alguma mensagem de erro retornada pela própria API Bradesco, e a exceção BradescoRequestException para problemas diversos de servidor e conexão (erros HTTP 4xx e 5xx) 
+* A única exceção que não exige retentativa, é a de código 69 pois representa que o Boleto já se encontra registrado 
 
 ## Testes
 Caso queira contribuir, por favor, implementar testes de unidade em PHPUnit.

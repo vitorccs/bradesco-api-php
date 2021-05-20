@@ -1,8 +1,12 @@
 <?php
+
 namespace BradescoApi\Helpers;
 
 class Fixer
 {
+    /**
+     * @var string[]
+     */
     protected static $defaultBankSlip = [
         // const values
         "cdBanco" => "237",
@@ -58,22 +62,34 @@ class Fixer
         "endEletronicoSacadorAvalista" => ""
     ];
 
+    /**
+     * @var string[]
+     */
     protected static $dateFields = [
         'dtEmissaoTitulo',
         'dtVencimentoTitulo'
     ];
 
+    /**
+     * @var string[]
+     */
     protected static $cpfCnpjFields = [
         'nuCpfcnpjPagador',
         'nuCpfcnpjSacadorAvalista'
     ];
 
+    /**
+     * @var string[]
+     */
     protected static $currencyFields = [
         'vlJuros',
         'vlMulta',
         'vlNominalTitulo'
     ];
 
+    /**
+     * @var string[]
+     */
     protected static $textFields = [
         'nomePagador',
         'logradouroPagador',
@@ -89,6 +105,9 @@ class Fixer
         'ufSacadorAvalista'
     ];
 
+    /**
+     * @var array[]
+     */
     protected static $clipTextields = [
         ['nuCliente', 10],
         ['controleParticipante', 25],
@@ -106,11 +125,17 @@ class Fixer
         ['ufSacadorAvalista', 2]
     ];
 
+    /**
+     * @param array $data
+     */
     public static function mergeWithDefaultData(array &$data)
     {
         $data = array_merge(static::$defaultBankSlip, $data);
     }
 
+    /**
+     * @param array $data
+     */
     public static function formatData(array &$data)
     {
         foreach(static::$dateFields as $field) {
@@ -130,7 +155,7 @@ class Fixer
 
         foreach(static::$textFields as $field) {
             if (!isset($data[$field])) continue;
-            $data[$field] = Formatter::formatText($data[$field]);
+            $data[$field] = Formatter::formatAlpha($data[$field]);
         }
 
         foreach(static::$clipTextields as $rule) {
@@ -141,6 +166,9 @@ class Fixer
         }
     }
 
+    /**
+     * @param array $data
+     */
     public static function changeNullToEmpty(array &$data)
     {
         array_walk($data, function(&$item, $key) {
@@ -150,6 +178,9 @@ class Fixer
         });
     }
 
+    /**
+     * @param array $data
+     */
     public static function changeNumericToString(array &$data)
     {
         array_walk($data, function(&$item, $key) {
@@ -159,6 +190,9 @@ class Fixer
         });
     }
 
+    /**
+     * @param array $data
+     */
     public static function setCustomerType(array &$data)
     {
         if ($data['cdIndCpfcnpjPagador'] ?? null) return;
@@ -170,6 +204,9 @@ class Fixer
         $data['cdIndCpfcnpjPagador'] = $isPerson ? "1" : "2";
     }
 
+    /**
+     * @param array $data
+     */
     public static function fixAll(array &$data)
     {
         // Per Bradesco API specs, all non-used fields must be
@@ -189,5 +226,3 @@ class Fixer
         static::setCustomerType($data);
     }
 }
-
-?>

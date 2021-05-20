@@ -1,31 +1,182 @@
 <?php
+
 namespace BradescoApi\Http;
 
 use BradescoApi\Exceptions\BradescoParameterException;
 
 class Bradesco
 {
-    const SANDBOX                 = 'BRADESCO_SANDBOX';
-    const TIMEOUT                 = 'BRADESCO_TIMEOUT';
-    const CERT_PATH               = 'BRADESCO_CERT_PATH';
-    const CERT_PASSWORD           = 'BRADESCO_CERT_PASSWORD';
-    const FOLDER_PATH             = 'BRADESCO_FOLDER_PATH';
+    /**
+     * The key name for setting Sandbox parameter
+     */
+    const SANDBOX = 'BRADESCO_SANDBOX';
 
-    private static $apiUrl        = null;
-    private static $sandbox       = null;
-    private static $timeout       = null;
-    private static $certPath      = null;
-    private static $certPassword  = null;
-    private static $folderPath    = null;
+    /**
+     * The key name for setting Bradesco Timeout parameter
+     */
+    const TIMEOUT = 'BRADESCO_TIMEOUT';
 
-    private static $defIsSandbox  = true;
-    private static $defTimeout    = 30;
+    /**
+     * The key name for setting Certification Path parameter
+     */
+    const CERT_PATH = 'BRADESCO_CERT_PATH';
+
+    /**
+     * The key name for setting Certification Password parameter
+     */
+    const CERT_PASSWORD = 'BRADESCO_CERT_PASSWORD';
+
+    /**
+     * The key name for setting Folder Path parameter
+     */
+    const FOLDER_PATH = 'BRADESCO_FOLDER_PATH';
+
+    /**
+     * @var string|null
+     */
+    private static $apiUrl = null;
+
+    /**
+     * @var bool|null
+     */
+    private static $sandbox = null;
+
+    /**
+     * @var int|null
+     */
+    private static $timeout = null;
+
+    /**
+     * @var string|null
+     */
+    private static $certPath = null;
+
+    /**
+     * @var string|null
+     */
+    private static $certPassword = null;
+
+    /**
+     * @var string|null
+     */
+    private static $folderPath = null;
+
+    /**
+     * @var bool
+     */
+    private static $defIsSandbox = true;
+
+    /**
+     * @var int
+     */
+    private static $defTimeout = 30;
+
+    /**
+     * @var string
+     */
     private static $defFolderPath = '';
 
-    private static $sandboxUrl    = 'https://cobranca.bradesconetempresa.b.br/ibpjregistrotitulows/registrotitulohomologacao';
-    private static $productionUrl = 'https://cobranca.bradesconetempresa.b.br/ibpjregistrotitulows/registrotitulo';
-    private static $sdkVersion    = "1.5.0";
+    /**
+     * @var string
+     */
+    private static $sandboxUrl = 'https://cobranca.bradesconetempresa.b.br/ibpjregistrotitulows/registrotitulohomologacao';
 
+    /**
+     * @var string
+     */
+    private static $productionUrl = 'https://cobranca.bradesconetempresa.b.br/ibpjregistrotitulows/registrotitulo';
+
+    /**
+     * @var string
+     */
+    private static $sdkVersion = "1.6.0";
+
+    /**
+     * @return bool
+     */
+    public static function isSandbox(): bool
+    {
+        if (static::$sandbox === null) {
+            static::setIsSandbox();
+        }
+
+        return static::$sandbox;
+    }
+
+    /**
+     * @return string
+     */
+    public static function getApiUrl(): string
+    {
+        if (static::$apiUrl === null) {
+            static::setApiUrl();
+        }
+
+        return static::$apiUrl;
+    }
+
+    /**
+     * @return int
+     */
+    public static function getTimeout(): int
+    {
+        if (is_null(static::$timeout)) {
+            static::setTimeout();
+        }
+
+        return static::$timeout;
+    }
+
+    /**
+     * @return string
+     * @throws BradescoParameterException
+     */
+    public static function getCertPath(): string
+    {
+        if (is_null(static::$certPath)) {
+            static::setCertPath();
+        }
+
+        return static::$certPath;
+    }
+
+    /**
+     * @return string
+     */
+    public static function getFolderPath(): string
+    {
+        if (is_null(static::$folderPath)) {
+            static::setFolderPath();
+        }
+
+        return static::$folderPath;
+    }
+
+    /**
+     * @return string
+     * @throws BradescoParameterException
+     */
+    public static function getCertPassword(): string
+    {
+        if (is_null(static::$certPassword)) {
+            static::setCertPassword();
+        }
+
+        return static::$certPassword;
+    }
+
+    /**
+     * @return string
+     */
+    public static function getSdkVersion(): string
+    {
+        return static::$sdkVersion;
+    }
+
+    /**
+     * @param array $params
+     * @throws BradescoParameterException
+     */
     public static function setParams(array $params)
     {
         if (isset($params[static::SANDBOX])) {
@@ -49,140 +200,109 @@ class Bradesco
         }
     }
 
-    public static function setIsSandbox(bool $enable = null)
+    /**
+     * @param bool|null $enable
+     */
+    public static function setIsSandbox(bool $enable = null): void
     {
-        static::$sandbox = $enable;
+        $envValue = getenv(static::SANDBOX);
 
-        if (static::$sandbox === null) {
-            static::$sandbox = getenv(static::SANDBOX);
-
-            if (static::$sandbox === false) {
-                static::$sandbox = static::$defIsSandbox;
-            }
+        if ($envValue === false) {
+            $envValue = null;
         }
 
-        if (is_string(static::$sandbox)) {
-            static::$sandbox = (static::$sandbox == 'false' ? false : true);
+        if (is_string($envValue)) {
+            $envValue = !(strtolower($envValue) === 'false');
         }
+
+        $fallback = !is_null($envValue)
+            ? $envValue
+            : static::$defIsSandbox;
+
+        static::$sandbox = !is_null($enable)
+            ? $enable
+            : $fallback;
     }
 
-    public static function isSandbox()
+    /**
+     * @param string|null $url
+     */
+    public static function setApiUrl(string $url = null): void
     {
-        if (static::$sandbox === null) {
-            static::setIsSandbox();
-        }
-
-        return static::$sandbox;
+        static::$apiUrl = !empty($url)
+            ? $url
+            : (static::isSandbox() ? static::$sandboxUrl : static::$productionUrl);
     }
 
-    public static function setApiUrl(string $url = null)
+    /**
+     * @param int|null $seconds
+     */
+    public static function setTimeout(int $seconds = null): void
     {
-        static::$apiUrl = $url;
+        $fallback = is_numeric(getenv(static::TIMEOUT))
+            ? (int) getenv(static::TIMEOUT)
+            : static::$defTimeout;
 
-        if (static::$apiUrl === null) {
-            static::$apiUrl = static::isSandbox() ? static::$sandboxUrl : static::$productionUrl;
-        }
+        static::$timeout = is_numeric($seconds)
+            ? $seconds
+            : $fallback;
     }
 
-    public static function getApiUrl()
+    /**
+     * @param string|null $path
+     * @throws BradescoParameterException
+     */
+    public static function setCertPath(string $path = null): void
     {
-        if (static::$apiUrl === null) {
-            static::setApiUrl();
-        }
+        $envValue = getenv(static::CERT_PATH);
 
-        return static::$apiUrl;
-    }
+        $fallback = $envValue !== false && !is_null($envValue)
+            ? $envValue
+            : null;
 
-    public static function setTimeout(int $seconds = null)
-    {
-        static::$timeout = $seconds;
+        static::$certPath = !is_null($path)
+            ? $path
+            : $fallback;
 
-        if (static::$timeout === null) {
-            static::$timeout = getenv(static::TIMEOUT);
-        }
-
-        if (static::$timeout === false) {
-            static::$timeout = static::$defTimeout;
-        }
-    }
-
-    public static function setCertPath(string $path = null)
-    {
-        static::$certPath = $path;
-
-        if (static::$certPath === null) {
-            static::$certPath = getenv(static::CERT_PATH);
-        }
-
-        if (static::$certPath === false) {
+        if (is_null(static::$certPath)) {
             throw new BradescoParameterException("Missing required parameter 'CERT_PATH'");
         }
     }
 
-    public static function setFolderPath(string $path = null)
+    /**
+     * @param string|null $path
+     */
+    public static function setFolderPath(string $path = null): void
     {
-        static::$folderPath = $path;
+        $envValue = getenv(static::FOLDER_PATH);
 
-        if (static::$folderPath === null) {
-            static::$folderPath = getenv(static::FOLDER_PATH);
-        }
+        $fallback = $envValue !== false && !is_null($envValue)
+            ? $envValue
+            : static::$defFolderPath;
 
-        if (static::$folderPath === false) {
-            static::$folderPath = static::$defFolderPath;
-        }
+        static::$folderPath = !is_null($path)
+            ? $path
+            : $fallback;
     }
 
-    public static function setCertPassword(string $password = null)
+    /**
+     * @param string|null $password
+     * @throws BradescoParameterException
+     */
+    public static function setCertPassword(string $password = null): void
     {
-        static::$certPassword = $password;
+        $envValue = getenv(static::CERT_PASSWORD);
 
-        if (static::$certPassword === null) {
-            static::$certPassword = getenv(static::CERT_PASSWORD);
-        }
+        $fallback = $envValue !== false && !is_null($envValue)
+            ? $envValue
+            : null;
 
-        if (static::$certPassword === false) {
+        static::$certPassword = !is_null($password)
+            ? $password
+            : $fallback;
+
+        if (is_null(static::$certPassword)) {
             throw new BradescoParameterException("Missing required parameter 'CERT_PASSWORD'");
         }
-    }
-
-    public static function getTimeout()
-    {
-        if (static::$timeout === null) {
-            static::setTimeout();
-        }
-
-        return static::$timeout;
-    }
-
-    public static function getCertPath()
-    {
-        if (static::$certPath === null) {
-            static::setCertPath();
-        }
-
-        return static::$certPath;
-    }
-
-    public static function getFolderPath()
-    {
-        if (static::$folderPath === null) {
-            static::setFolderPath();
-        }
-
-        return static::$folderPath;
-    }
-
-    public static function getCertPassword()
-    {
-        if (static::$certPassword === null) {
-            static::setCertPassword();
-        }
-
-        return static::$certPassword;
-    }
-
-    public static function getSdkVersion()
-    {
-        return static::$sdkVersion;
     }
 }

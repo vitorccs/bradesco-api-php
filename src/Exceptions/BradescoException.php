@@ -1,13 +1,21 @@
 <?php
+
 namespace BradescoApi\Exceptions;
 
 use Exception;
 
 class BradescoException extends Exception
 {
+    /**
+     * @var int|null
+     */
     protected $errorCode;
 
-    public function __construct(string $message = null, $errorCode = null)
+    /**
+     * @param string|null $message
+     * @param int|null $errorCode
+     */
+    public function __construct(string $message = null, int $errorCode = null)
     {
         $message = $message ? trim($message) : 'Undefined error';
 
@@ -16,7 +24,10 @@ class BradescoException extends Exception
         parent::__construct($message);
     }
 
-    public function getErrorCode()
+    /**
+     * @return int|null
+     */
+    public function getErrorCode(): ?int
     {
         return $this->errorCode;
     }
