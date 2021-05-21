@@ -2,6 +2,7 @@
 
 namespace BradescoApi\Http;
 
+use GuzzleHttp\Exception\ConnectException;
 use Psr\Http\Message\ResponseInterface;
 use GuzzleHttp\Exception\RequestException;
 use BradescoApi\Exceptions\BradescoApiException;
@@ -39,7 +40,7 @@ class Api
      * @throws BradescoRequestException
      * @throws BradescoApiException
      */
-    public function post(array $params = [], string $endpoint = null): \stdClass
+    public function post(array $params = [], string $endpoint = ''): \stdClass
     {
         $options = [
             'body' => $this->encryptBodyData($params)
@@ -56,7 +57,7 @@ class Api
      * @throws BradescoApiException
      * @throws BradescoRequestException
      */
-    private function request(string $method, string $endpoint = null, array $options = []): \stdClass
+    private function request(string $method, string $endpoint = '', array $options = []): \stdClass
     {
         try {
             $response = $this->client->request($method, $endpoint, $options);
@@ -66,6 +67,8 @@ class Api
             }
 
             $response = $e->getResponse();
+        } catch (ConnectException $e) { // Guzzle >= v7.x
+            throw new BradescoRequestException($e->getMessage());
         }
 
         return $this->response($response);
