@@ -11,7 +11,10 @@
          stopOnFailure="false">
     <testsuites>
         <testsuite name="Bradesco API Test Suite">
-            <file>tests/BradescoTest.php</file>
+            <file>tests/Helpers/FormatterTest.php</file>
+            <file>tests/Http/BradescoTest.php</file>
+            <file>tests/Http/ApiTest.php</file>
+            <file>tests/Http/ClientTest.php</file>
             <file>tests/BankSlipTest.php</file>
         </testsuite>
     </testsuites>

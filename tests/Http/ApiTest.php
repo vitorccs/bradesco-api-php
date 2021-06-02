@@ -6,9 +6,9 @@ namespace BradescoApi\Test\Http;
 
 use BradescoApi\Exceptions\BradescoRequestException;
 use BradescoApi\Http\Api;
-use PHPUnit\Framework\TestCase;
+use BradescoApi\Test\AbstractTest;
 
-class ApiTest extends TestCase
+class ApiTest extends AbstractTest
 {
     public function testRequestException()
     {
@@ -16,5 +16,16 @@ class ApiTest extends TestCase
 
         $api = new Api();
         $api->post([], 'INVALID');
+    }
+
+    /**
+     * @dataProvider validDataProvider
+     */
+    public function testEncryption(array $validData)
+    {
+        $api = new Api();
+        $encrypted = $api->encryptBodyData($validData);
+
+        $this->assertNotEmpty($encrypted);
     }
 }
