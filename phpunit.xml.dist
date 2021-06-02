@@ -11,7 +11,10 @@
          stopOnFailure="false">
     <testsuites>
         <testsuite name="Bradesco API Test Suite">
-            <file>tests/BradescoTest.php</file>
+            <file>tests/Helpers/FormatterTest.php</file>
+            <file>tests/Http/BradescoTest.php</file>
+            <file>tests/Http/ApiTest.php</file>
+            <file>tests/Http/ClientTest.php</file>
             <file>tests/BankSlipTest.php</file>
         </testsuite>
     </testsuites>
@@ -21,7 +24,6 @@
         </whitelist>
     </filter>
     <php>
-        <env name="BRADESCO_SANDBOX" value="true"/>
         <env name="BRADESCO_TIMEOUT" value="20"/>
         <env name="BRADESCO_CERT_PATH" value="myCertificate.pfx"/>
         <env name="BRADESCO_CERT_PASSWORD" value="myPassword"/>

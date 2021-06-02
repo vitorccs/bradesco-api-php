@@ -2,6 +2,7 @@
 
 namespace BradescoApi\Http;
 
+use GuzzleHttp\Exception\ConnectException;
 use Psr\Http\Message\ResponseInterface;
 use GuzzleHttp\Exception\RequestException;
 use BradescoApi\Exceptions\BradescoApiException;
@@ -20,11 +21,6 @@ class Api
     const SUCCESS_CODE = 0;
 
     /**
-     * The error code value in case Bradesco API returns an empty body
-     */
-    const EMPTY_BODY_CODE = -100;
-
-    /**
      * Api constructor.
      */
     public function __construct()
@@ -39,7 +35,7 @@ class Api
      * @throws BradescoRequestException
      * @throws BradescoApiException
      */
-    public function post(array $params = [], string $endpoint = null): \stdClass
+    public function post(array $params = [], string $endpoint = ''): \stdClass
     {
         $options = [
             'body' => $this->encryptBodyData($params)
@@ -56,7 +52,7 @@ class Api
      * @throws BradescoApiException
      * @throws BradescoRequestException
      */
-    private function request(string $method, string $endpoint = null, array $options = []): \stdClass
+    private function request(string $method, string $endpoint = '', array $options = []): \stdClass
     {
         try {
             $response = $this->client->request($method, $endpoint, $options);
@@ -66,6 +62,8 @@ class Api
             }
 
             $response = $e->getResponse();
+        } catch (ConnectException $e) { // Guzzle >= v7.x
+            throw new BradescoRequestException($e->getMessage());
         }
 
         return $this->response($response);
@@ -115,7 +113,7 @@ class Api
         // (not in accordance with RESTful specs)
         $this->checkForApiException($data);
 
-        $this->checkForRequestException($response, $data);
+        $this->checkForRequestException($response);
     }
 
     /**
@@ -140,10 +138,9 @@ class Api
 
     /**
      * @param ResponseInterface $response
-     * @param \stdClass|null $data
      * @throws BradescoRequestException
      */
-    private function checkForRequestException(ResponseInterface $response, ?\stdClass $data = null)
+    private function checkForRequestException(ResponseInterface $response)
     {
         $code = $response->getStatusCode();
         $message = $response->getReasonPhrase();
@@ -151,12 +148,7 @@ class Api
         $statusClass = (int)($code / 100);
         $isHttpError = $statusClass === 4 || $statusClass === 5;
 
-        if (!$isHttpError && !is_null($data)) return;
-
-        if (is_null($data)) {
-            $message = 'Bradesco returned an empty Body';
-            $code = self::EMPTY_BODY_CODE;
-        }
+        if (!$isHttpError) return;
 
         throw new BradescoRequestException($message, $code);
     }

@@ -32,11 +32,6 @@ class Bradesco
     const FOLDER_PATH = 'BRADESCO_FOLDER_PATH';
 
     /**
-     * @var string|null
-     */
-    private static $apiUrl = null;
-
-    /**
      * @var bool|null
      */
     private static $sandbox = null;
@@ -89,7 +84,7 @@ class Bradesco
     /**
      * @var string
      */
-    private static $sdkVersion = "1.6.0";
+    private static $sdkVersion = "1.6.1";
 
     /**
      * @return bool
@@ -108,11 +103,9 @@ class Bradesco
      */
     public static function getApiUrl(): string
     {
-        if (static::$apiUrl === null) {
-            static::setApiUrl();
-        }
-
-        return static::$apiUrl;
+        return static::isSandbox()
+            ? static::$sandboxUrl
+            : static::$productionUrl;
     }
 
     /**
@@ -173,6 +166,23 @@ class Bradesco
         return static::$sdkVersion;
     }
 
+
+    /**
+     * @return string
+     */
+    public static function getSandboxUrl(): string
+    {
+        return self::$sandboxUrl;
+    }
+
+    /**
+     * @return string
+     */
+    public static function getProductionUrl(): string
+    {
+        return self::$productionUrl;
+    }
+
     /**
      * @param array $params
      * @throws BradescoParameterException
@@ -222,16 +232,6 @@ class Bradesco
         static::$sandbox = !is_null($enable)
             ? $enable
             : $fallback;
-    }
-
-    /**
-     * @param string|null $url
-     */
-    public static function setApiUrl(string $url = null): void
-    {
-        static::$apiUrl = !empty($url)
-            ? $url
-            : (static::isSandbox() ? static::$sandboxUrl : static::$productionUrl);
     }
 
     /**
