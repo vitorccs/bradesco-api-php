@@ -21,7 +21,6 @@
         </whitelist>
     </filter>
     <php>
-        <env name="BRADESCO_SANDBOX" value="true"/>
         <env name="BRADESCO_TIMEOUT" value="20"/>
         <env name="BRADESCO_CERT_PATH" value="myCertificate.pfx"/>
         <env name="BRADESCO_CERT_PASSWORD" value="myPassword"/>

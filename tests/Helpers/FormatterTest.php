@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace BradescoApi\Test;
+namespace BradescoApi\Test\Helpers;
 
 use BradescoApi\Helpers\Formatter;
 use PHPUnit\Framework\TestCase;
@@ -45,7 +45,7 @@ class FormatterTest extends TestCase
         }
     }
 
-    public function testCpf()
+    public function testCpfFormatter()
     {
         $before = ["123.456.789-00", 12345678900];
         $after = "00012345678900";
@@ -55,7 +55,7 @@ class FormatterTest extends TestCase
         }
     }
 
-    public function testCnpj()
+    public function testCnpjFormatter()
     {
         $before = ["60.746.948/0001-12", 60746948000112];
         $after = "60746948000112";
@@ -65,7 +65,7 @@ class FormatterTest extends TestCase
         }
     }
 
-    public function testAlpha()
+    public function testAlphaFormatter()
     {
         $before = "ãáàâÃÁÀÂẽéèêẼÉÈÊĩíìîĨÍÌÎõóòôÕÓÒÔũúùûŨÚÙÛçÇ!@#$%*()_+{}:><,.;/]-'\" ";
         $after = "aaaaAAAAeeeeEEEEiiiiIIIIooooOOOOuuuuUUUUcC- ";
