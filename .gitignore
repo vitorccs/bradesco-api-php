@@ -1,6 +1,7 @@
 .idea
 build
 composer.phar
+composer.lock
 vendor
 phpunit.xml
 index.php

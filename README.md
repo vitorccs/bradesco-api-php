@@ -119,6 +119,9 @@ try {
 * A exceção BradescoApiException é lançada quando é detectado alguma mensagem de erro retornada pela própria API Bradesco, e a exceção BradescoRequestException para problemas diversos de servidor e conexão (erros HTTP 4xx e 5xx) 
 * A única exceção que não exige retentativa, é a de código 69 pois representa que o Boleto já se encontra registrado 
 
+## OpenSSL 3
+A partir da versão 3 do OpenSSL, o certificado `.pfx` pode apresentar erro de leitura e será necessário habilitar o modo "legacy" ([veja no StackOverflow](https://stackoverflow.com/questions/73832854/php-openssl-pkcs12-read-error0308010cdigital-envelope-routinesunsupported)) 
+
 ## Testes
 Caso queira contribuir, por favor, implementar testes de unidade em PHPUnit.
 
